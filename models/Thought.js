@@ -1,69 +1,32 @@
-const { Schema, model } = require('mongoose');
+const { Schema, model } = require("mongoose");
+const Reaction = require("./Reaction")
 
-const moment = require('moment')
-
-const reactionSchema = new Schema (
+const thoughtSchema = new Schema(
   {
-     reactionId: {
-      type: Schema.Types.ObjectId,
-      default: () => new Types.ObjectId(),
-     },
-     reactionBody: {
-      type: String,
-      required: true,
-      maxlength: 280
-     },
-     username: {
-      type: String,
-      required: true,
-     },
-     createdAt: {
-      type: Date,
-      default: Date.now,
-      get: createdAtVal => moment(createdAtVal).format("MMM DD, YYYY [at] hh:mm a"),
-     },
+    text: 
+    { type: String, 
+    required: true ,
+    minLength: 1,
+    maxLength: 280
+    },
+    createAt: { type: Date, default: Date.now() },
+    username: { type: String, required: true },
+    reactions: [Reaction],
   },
   {
-      toJSON: {
-          virtuals: true,
-          getters: true
-      },
-      id: false,
-  }
-)
-
-const thoughtSchema = new Schema (
-    {
-      thoughtText: {
-        type: String,
-        required: true,
-        minlength: 1,
-        maxlength: 280,
-      },
-      createdAt: {
-        type: Date,
-        default: Date.now,
-        get: createdAtVal => moment(createdAtVal).format("MMM DD, YYYY [at] hh:mm a"),
-      },
-      username: {
-        type: String,
-        required: true,
-      },
-      reactions: [reactionSchema],
+    toJSON: {
+      virtuals: true,
     },
-    {
-        toJSON: {
-            virtuals: true,
-            getters: true,
-        },
-        id: false,
-    }
-)
+    id: false,
+  }
+);
 
-thoughtSchema.virtual('reactionCount')
-.get(function() {
-    return this.reactions.length;
-})
+// Create a virtual property `commentCount` that gets the amount of comments per post
+thoughtSchema.virtual("thoughtsLength").get(function () {
+  return this.text.length;
+});
 
-const Thought = model('Thought', thoughtSchema);
+// Initialize the Comment model
+const Thought = model("thought", thoughtSchema);
+
 module.exports = Thought;
